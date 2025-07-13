@@ -1,66 +1,79 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>אימות UID</title>
+  <title>Verify UID</title>
   <style>
     body {
-      background-color: #0a1629;
-      color: white;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0c1e3a;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    h2 {
+      margin-bottom: 10px;
     }
     input {
-      padding: 12px;
-      width: 80%;
-      margin: 10px 0;
+      padding: 10px;
       font-size: 16px;
       border-radius: 8px;
       border: none;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 300px;
+      text-align: center;
     }
-    .button {
+    button {
       padding: 12px 20px;
       font-size: 16px;
-      background-color: #1e88e5;
+      background-color: #1e90ff;
       color: white;
       border: none;
-      border-radius: 10px;
-      margin: 10px;
+      border-radius: 8px;
       cursor: pointer;
+      width: 100%;
+      max-width: 300px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <h2>אמת את ה-UID שלך</h2>
-  <input type="text" id="uid" placeholder="הכנס UID כאן" />
-
-  <br/>
-  <button class="button" onclick="verifyUID()">אימות</button>
-  <button class="button" onclick="goBack()">⬅ חזור</button>
+  <h2>Verify your UID</h2>
+  <input type="text" id="uid" placeholder="Enter UID here" />
+  <button onclick="verifyUID()">Verify UID</button>
+  <div id="result"></div>
 
   <script>
     async function verifyUID() {
-      const uid = document.getElementById('uid').value;
-      if (!uid) return alert('נא להזין UID');
+      const uid = document.getElementById("uid").value.trim();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerText = "Checking...";
 
       try {
-        const res = await fetch('https://telegrambot-production-a0ac.up.railway.app/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid }),
+        const response = await fetch("https://telegrambot-production-a0ac.up.railway.app/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ uid: uid }),
         });
 
-        const data = await res.json();
-        alert(data.message || 'התשובה התקבלה');
-      } catch (err) {
-        alert('שגיאה באימות. נסה שוב.');
-      }
-    }
+        const data = await response.json();
 
-    function goBack() {
-      window.history.back(); // Go back to register.html
+        if (data.found) {
+          resultDiv.innerText = "✅ UID verified successfully!";
+        } else {
+          resultDiv.innerText = "❌ UID not found. Please make sure you registered through the referral link.";
+        }
+      } catch (error) {
+        resultDiv.innerText = "⚠️ Verification failed. Please try again later.";
+      }
     }
   </script>
 </body>
